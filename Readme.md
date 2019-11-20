@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Александр Мечев](https://up.htmlacademy.ru/ecmascript/10/user/951253).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Бахтин](https://htmlacademy.ru/profile/id1006021)`.
 
 ---
 
