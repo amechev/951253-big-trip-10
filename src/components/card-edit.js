@@ -69,8 +69,8 @@ export const createCardEditTemplate = (card) => {
   const citiesMarkup = creatingCitiesMarkup(Cities);
   const optionsMarkup = createOptionsMarkup(options);
   const photosMarkup = createPhotosMarkup(pictures);
-  const startDate = `${start.getDay()}/${start.getMonth()}/${start.getFullYear()} ${start.getHours()}:${start.getMinutes()}`;
-  const finishDate = `${finish.getDay()}/${finish.getMonth()}/${finish.getFullYear()} ${finish.getHours()}:${finish.getMinutes()}`;
+  const startDate = `${start.getDate()}/${start.getMonth()}/${start.getFullYear()} ${start.getHours()}:${start.getMinutes()}`;
+  const finishDate = `${finish.getDate()}/${finish.getMonth()}/${finish.getFullYear()} ${finish.getHours()}:${finish.getMinutes()}`;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">

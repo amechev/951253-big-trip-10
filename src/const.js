@@ -101,4 +101,19 @@ export const Menu = [
     name: `Stats`,
     value: false
   }
-]
+];
+
+export const MonthNames = [
+  `JAN`,
+  `FEB`,
+  `MAR`,
+  `APR`,
+  `MAY`,
+  `JUN`,
+  `JUL`,
+  `AUG`,
+  `SEP`,
+  `OCT`,
+  `NOV`,
+  `DEC`,
+];
