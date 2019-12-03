@@ -1,4 +1,5 @@
 import {TypesIcons, Transfers, Activities, Cities, Options} from "../const";
+import {createElement} from "../utils";
 
 const createTransfersMarkup = (items) => {
   return Array.from(items)
@@ -61,7 +62,7 @@ const createPhotosMarkup = (items) => {
     }).join(`\n`);
 };
 
-export const createCardEditTemplate = (card) => {
+const createCardEditTemplate = (card) => {
   const {type, location, pictures, description, start, finish, price, options} = card;
   const pointType = Transfers.some((el) => el === type) ? `to` : `on`;
   const transfersMarkup = createTransfersMarkup(Transfers);
@@ -152,3 +153,26 @@ export const createCardEditTemplate = (card) => {
           </form>`
   );
 };
+
+export default class CardEdit {
+  constructor(card) {
+    this._element = null;
+    this._card = card;
+  }
+
+  getTemplate() {
+    return createCardEditTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

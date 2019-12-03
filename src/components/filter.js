@@ -1,3 +1,5 @@
+import {createElement} from "../utils";
+
 const createFilterMarkup = (items) => {
   return Array.from(items)
     .map((item) => {
@@ -15,7 +17,7 @@ const createFilterMarkup = (items) => {
     }).join(`\n`);
 };
 
-export const createSiteFilterTemplate = (filters) => {
+const createSiteFilterTemplate = (filters) => {
   const filtersMarkup = createFilterMarkup(filters);
   return (
     `<form class="trip-filters" action="#" method="get">
@@ -25,3 +27,26 @@ export const createSiteFilterTemplate = (filters) => {
       </form>`
   );
 };
+
+export default class Filter {
+  constructor(items) {
+    this._element = null;
+    this._items = items;
+  }
+
+  getTemplate() {
+    return createSiteFilterTemplate(this._items);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

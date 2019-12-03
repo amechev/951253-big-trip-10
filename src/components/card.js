@@ -1,5 +1,5 @@
 import {Options, Transfers, TypesIcons} from "../const";
-import {timeStringFormater} from "../utils";
+import {createElement, timeStringFormater} from "../utils";
 
 const createOptionsMarkup = (items) => {
   return Array.from(items)
@@ -32,7 +32,7 @@ const getPointTimeMarkup = (start, finish) => {
               <time class="event__end-time" datetime="${finish}">${finishTime}</time>`;
 };
 
-export const createCardTemplate = (card) => {
+const createCardTemplate = (card) => {
   const {type, location, start, finish, price, options} = card;
   const pointType = Transfers.some((el) => el === type) ? `to` : `on`;
   const pointTimeMarkup = getPointTimeMarkup(start, finish);
@@ -72,3 +72,26 @@ export const createCardTemplate = (card) => {
       </li>`
   );
 };
+
+export default class Card {
+  constructor(card) {
+    this._element = null;
+    this._card = card;
+  }
+
+  getTemplate() {
+    return createCardTemplate(this._card);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
