@@ -6,6 +6,7 @@ import CardComponent from "./components/card";
 import CardEditComponent from "./components/card-edit";
 import InfoComponent from "./components/info";
 import TotalComponent from "./components/total";
+import NoCardsComponent from "./components/no-cards";
 import {generateCard, generateCards} from "./mock/card";
 import {generateFilters} from "./mock/filters";
 import {generateMenu} from "./mock/menu";
@@ -14,18 +15,34 @@ import {render, RenderPosition} from "./utils";
 const CARDS_COUNT = 4;
 
 const renderCard = (task, day) => {
+  const onEscKeyDown = (evt) => {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscKey) {
+      replaceEditToTask();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  const replaceEditToTask = () => {
+    day.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
+  };
+
+  const replaceTaskToEdit = () => {
+    day.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
+  };
+
   const cardComponent = new CardComponent(task);
-  const cardEditComponent = new CardEditComponent(task);
 
   const openButton = cardComponent.getElement().querySelector(`.event__rollup-btn`);
   openButton.addEventListener(`click`, () => {
-    day.replaceChild(cardEditComponent.getElement(), cardComponent.getElement());
+    replaceTaskToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
   });
 
+  const cardEditComponent = new CardEditComponent(task);
   const editForm = cardEditComponent.getElement();
-  editForm.addEventListener(`submit`, () => {
-    day.replaceChild(cardComponent.getElement(), cardEditComponent.getElement());
-  });
+  editForm.addEventListener(`submit`, replaceEditToTask);
 
   render(day, cardComponent.getElement(), RenderPosition.BEFOREEND);
 };
@@ -44,27 +61,43 @@ render(siteControlsElement, new MenuComponent(menu).getElement(), RenderPosition
 
 const filters = generateFilters();
 render(siteControlsElement, new FilterComponent(filters).getElement(), RenderPosition.BEFOREEND);
-render(siteEventsElement, new DaysListComponent().getElement(), RenderPosition.BEFOREEND);
 
-const daysListElement = siteEventsElement.querySelector(`.trip-days`);
-let currentDay = 1;
-let currentDate = points[0].start;
-render(daysListElement, new DayComponent(currentDate, currentDay).getElement(), RenderPosition.BEFOREEND);
-let dayEventsListElement = siteEventsElement.querySelector(`.trip-events__list`);
+const renderNoCardsPage = () => {
+  render(siteEventsElement, new NoCardsComponent().getElement(), RenderPosition.BEFOREEND);
+};
 
-points.forEach((item) => {
-  if (item.start.getDate() !== currentDate.getDate()) {
-    currentDay++;
-    currentDate = item.start;
-    render(daysListElement, new DayComponent(currentDate, currentDay).getElement(), RenderPosition.BEFOREEND);
-    const nodes = siteEventsElement.querySelectorAll(`.trip-events__list`);
-    dayEventsListElement = nodes[nodes.length - 1];
-  }
+const renderCardsPage = () => {
+  render(siteEventsElement, new DaysListComponent().getElement(), RenderPosition.BEFOREEND);
 
-  renderCard(item, dayEventsListElement)
+  const daysListElement = siteEventsElement.querySelector(`.trip-days`);
+  let currentDay = 1;
+  let currentDate = points[0].start;
+  render(daysListElement, new DayComponent(currentDate, currentDay).getElement(), RenderPosition.BEFOREEND);
+  let dayEventsListElement = siteEventsElement.querySelector(`.trip-events__list`);
 
-});
+  points.forEach((item) => {
+    if (item.start.getDate() !== currentDate.getDate()) {
+      currentDay++;
+      currentDate = item.start;
+      render(daysListElement, new DayComponent(currentDate, currentDay).getElement(), RenderPosition.BEFOREEND);
+      const nodes = siteEventsElement.querySelectorAll(`.trip-events__list`);
+      dayEventsListElement = nodes[nodes.length - 1];
+    }
 
-const siteInfoElement = document.querySelector(`.trip-info`);
-render(siteInfoElement, new InfoComponent(points).getElement(), RenderPosition.BEFOREEND);
-render(siteInfoElement, new TotalComponent(points).getElement(), RenderPosition.BEFOREEND);
+    renderCard(item, dayEventsListElement)
+
+  });
+
+  const siteInfoElement = document.querySelector(`.trip-info`);
+  render(siteInfoElement, new InfoComponent(points).getElement(), RenderPosition.BEFOREEND);
+  render(siteInfoElement, new TotalComponent(points).getElement(), RenderPosition.BEFOREEND);
+}
+
+if (!points.length) {
+  renderNoCardsPage();
+} else {
+  renderCardsPage();
+}
+
+
+
