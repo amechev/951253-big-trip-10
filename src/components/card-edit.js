@@ -1,5 +1,5 @@
 import {TypesIcons, Transfers, Activities, Cities, Options} from "../const";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const createTransfersMarkup = (items) => {
   return Array.from(items)
@@ -154,9 +154,9 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit {
+export default class CardEdit extends AbstractComponent {
   constructor(card) {
-    this._element = null;
+    super();
     this._card = card;
   }
 
@@ -164,15 +164,7 @@ export default class CardEdit {
     return createCardEditTemplate(this._card);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }

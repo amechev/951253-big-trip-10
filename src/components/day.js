@@ -1,5 +1,5 @@
 import {MonthNames} from "../const";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const createDayItemTemplate = (date, cnt) => {
   const dateTime = `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`;
@@ -16,26 +16,14 @@ const createDayItemTemplate = (date, cnt) => {
   );
 };
 
-export default class Day {
+export default class Day extends AbstractComponent {
   constructor(date, cnt) {
-    this._element = null;
+    super();
     this._date = date;
     this._cnt = cnt;
   }
 
   getTemplate() {
     return createDayItemTemplate(this._date, this._cnt);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

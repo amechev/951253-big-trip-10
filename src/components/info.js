@@ -1,5 +1,5 @@
 import {MonthNames} from "../const";
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const createInfoTemplate = (points) => {
   const firstDateOfTrip = `${MonthNames[points[0].start.getMonth() - 1]} ${points[0].start.getDate()}`;
@@ -16,25 +16,13 @@ const createInfoTemplate = (points) => {
   );
 };
 
-export default class Info {
+export default class Info extends AbstractComponent {
   constructor(points) {
-    this._element = null;
+    super();
     this._points = points;
   }
 
   getTemplate() {
     return createInfoTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

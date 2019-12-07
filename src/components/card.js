@@ -1,5 +1,6 @@
 import {Options, Transfers, TypesIcons} from "../const";
-import {createElement, timeStringFormater} from "../utils";
+import AbstractComponent from "./abstract-component";
+import {timeStringFormater} from "../utils/common";
 
 const createOptionsMarkup = (items) => {
   return Array.from(items)
@@ -73,9 +74,9 @@ const createCardTemplate = (card) => {
   );
 };
 
-export default class Card {
+export default class Card extends AbstractComponent {
   constructor(card) {
-    this._element = null;
+    super();
     this._card = card;
   }
 
@@ -83,15 +84,8 @@ export default class Card {
     return createCardTemplate(this._card);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setEditButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, handler);
   }
 }
