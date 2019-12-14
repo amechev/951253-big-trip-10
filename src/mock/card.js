@@ -57,6 +57,7 @@ export const generateCard = () => {
     finish,
     price: getPrice(),
     options: getRandomOptions(),
+    isFavorite: false
   };
 };
 

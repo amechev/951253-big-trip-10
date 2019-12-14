@@ -1,6 +1,6 @@
 import {Options, Transfers, TypesIcons} from "../const";
-import AbstractComponent from "./abstract-component";
 import {timeStringFormater} from "../utils/common";
+import AbstractSmartComponent from "./abtract-smart-component";
 
 const createOptionsMarkup = (items) => {
   return Array.from(items)
@@ -74,7 +74,7 @@ const createCardTemplate = (card) => {
   );
 };
 
-export default class Card extends AbstractComponent {
+export default class Card extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;

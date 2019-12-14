@@ -1,23 +1,25 @@
 import {TypesIcons, Transfers, Activities, Cities, Options} from "../const";
-import AbstractComponent from "./abstract-component";
+import AbstractSmartComponent from "./abtract-smart-component";
 
-const createTransfersMarkup = (items) => {
+const createTransfersMarkup = (items, active) => {
   return Array.from(items)
     .map((item) => {
+      const isChecked = item === active ? `checked` : ``;
       return (
         `<div class="event__type-item">
-          <input id="event-type-${item}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item}">
+          <input id="event-type-${item}" ${isChecked} class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item}">
           <label class="event__type-label  event__type-label--${item}" for="event-type-${item}">${item}</label>
         </div>`
       );
     }).join(`\n`);
 };
-const createActivitiesMarkup = (items) => {
+const createActivitiesMarkup = (items, active) => {
   return Array.from(items)
     .map((item) => {
+      const isChecked = item === active ? `checked` : ``;
       return (
         `<div class="event__type-item">
-          <input id="event-type-${item}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item}">
+          <input id="event-type-${item}" ${isChecked} class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item}">
           <label class="event__type-label  event__type-label--${item}" for="event-type-${item}">${item}</label>
         </div>`
       );
@@ -63,15 +65,16 @@ const createPhotosMarkup = (items) => {
 };
 
 const createCardEditTemplate = (card) => {
-  const {type, location, pictures, description, start, finish, price, options} = card;
+  const {type, location, pictures, description, start, finish, price, options, isFavorite} = card;
   const pointType = Transfers.some((el) => el === type) ? `to` : `on`;
-  const transfersMarkup = createTransfersMarkup(Transfers);
+  const transfersMarkup = createTransfersMarkup(Transfers, type);
   const activitiesMarkup = createActivitiesMarkup(Activities);
   const citiesMarkup = creatingCitiesMarkup(Cities);
   const optionsMarkup = createOptionsMarkup(options);
   const photosMarkup = createPhotosMarkup(pictures);
   const startDate = `${start.getDate()}/${start.getMonth()}/${start.getFullYear()} ${start.getHours()}:${start.getMinutes()}`;
   const finishDate = `${finish.getDate()}/${finish.getMonth()}/${finish.getFullYear()} ${finish.getHours()}:${finish.getMinutes()}`;
+  const isChecked = isFavorite ? `checked` : ``;
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -128,6 +131,13 @@ const createCardEditTemplate = (card) => {
 
               <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
               <button class="event__reset-btn" type="reset">Cancel</button>
+              <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
+              <label class="event__favorite-btn" for="event-favorite-1">
+                <span class="visually-hidden">Add to favorite</span>
+                <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+                  <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+                </svg>
+              </label>
             </header>
             <section class="event__details">
 
@@ -154,10 +164,25 @@ const createCardEditTemplate = (card) => {
   );
 };
 
-export default class CardEdit extends AbstractComponent {
+export default class CardEdit extends AbstractSmartComponent {
   constructor(card) {
     super();
     this._card = card;
+    this._subscribeOnEvents();
+    this._submitHandler = null;
+    this._favoriteHandler = null;
+  }
+
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    this.rerender();
   }
 
   getTemplate() {
@@ -165,6 +190,30 @@ export default class CardEdit extends AbstractComponent {
   }
 
   setSubmitHandler(handler) {
-    this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
+  setFavoritesButtonClickHandler(handler) {
+    this._favoriteHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__favorite-btn`)
+      .addEventListener(`click`, this._favoriteHandler);
+
+    element.querySelector(`.event__save-btn`)
+      .addEventListener(`click`, this._submitHandler);
+
+    element.querySelectorAll(`.event__type-input`).forEach((item) => {
+      item.addEventListener(`click`, (event) => {
+        if (event.target.value) {
+          this._card.type = event.target.value;
+          this.rerender();
+        }
+      });
+    });
+
   }
 }

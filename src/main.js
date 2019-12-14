@@ -8,7 +8,7 @@ import {generateFilters} from "./mock/filters";
 import FilterComponent from "./components/filter";
 import TripController from "./controllers/trip";
 
-const CARDS_COUNT = 10;
+const CARDS_COUNT = 4;
 const events = generateCards(CARDS_COUNT);
 const siteControlsElement = document.querySelector(`.trip-controls`);
 const siteEventsElement = document.querySelector(`.trip-events`);
