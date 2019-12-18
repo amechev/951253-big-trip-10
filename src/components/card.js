@@ -1,6 +1,6 @@
 import {Options, Transfers, TypesIcons} from "../const";
-import {timeStringFormater} from "../utils/common";
 import AbstractSmartComponent from "./abtract-smart-component";
+import moment from "moment";
 
 const createOptionsMarkup = (items) => {
   return Array.from(items)
@@ -16,18 +16,9 @@ const createOptionsMarkup = (items) => {
     }).join(`\n`);
 };
 
-const getTimeDiffString = (time) => {
-  let hours = new Date(time).getUTCHours();
-  let minutes = new Date(time).getUTCMinutes();
-
-  hours = timeStringFormater(hours);
-  minutes = timeStringFormater(minutes);
-  return `${hours}H ${minutes}M `;
-};
-
 const getPointTimeMarkup = (start, finish) => {
-  const startTime = `${timeStringFormater(start.getHours())}:${timeStringFormater(start.getMinutes())}`;
-  const finishTime = `${timeStringFormater(finish.getHours())}:${timeStringFormater(finish.getMinutes())}`;
+  const startTime = moment(start).format(`HH:mm`);
+  const finishTime = moment(finish).format(`HH:mm`);
   return `<time class="event__start-time" datetime="${start}">${startTime}</time>
               &mdash;
               <time class="event__end-time" datetime="${finish}">${finishTime}</time>`;
@@ -39,8 +30,8 @@ const createCardTemplate = (card) => {
   const pointTimeMarkup = getPointTimeMarkup(start, finish);
 
   const offersMarkup = createOptionsMarkup(options);
-  const diffTime = (finish.getTime() - start.getTime());
-  const diff = getTimeDiffString(diffTime);
+  const diffTime = moment(finish).diff(moment(start));
+  const diff = moment.utc(diffTime).format(`HH[H] mm[M]`);
 
   return (
     `<li class="trip-events__item">

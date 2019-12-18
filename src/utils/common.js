@@ -11,7 +11,3 @@ export const getRandomArrayItem = (array) => {
 export const getRandomPicture = () => {
   return `http://picsum.photos/300/150?r=${Math.random()}`;
 };
-
-export const timeStringFormater = (time) => {
-  return time > 9 ? time : `0` + time;
-};

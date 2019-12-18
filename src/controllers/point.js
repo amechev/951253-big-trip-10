@@ -38,7 +38,6 @@ export default class PointController {
     });
 
     this._cardEditComponent.setSubmitHandler(() => {
-      this._cardComponent = new CardComponent(point);
       this._replaceEditToCard();
     });
 
