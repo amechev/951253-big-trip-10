@@ -14,12 +14,14 @@ const createTotalTemplate = (points) => {
 };
 
 export default class Total extends AbstractComponent {
-  constructor(points) {
+  constructor(pointsModel) {
     super();
-    this._points = points;
+    this._pointsModel = pointsModel;
+    this._points = null;
   }
 
   getTemplate() {
+    this._points = this._pointsModel.getPoints();
     return createTotalTemplate(this._points);
   }
 }

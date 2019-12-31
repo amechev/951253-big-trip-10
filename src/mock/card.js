@@ -50,7 +50,7 @@ export const generateCard = () => {
   const finish = randomFirstDate;
   return {
     type: getRandomArrayItem(Transfers.concat(Activities)),
-    location: getRandomArrayItem(Cities),
+    destination: getRandomArrayItem(Cities),
     pictures: getRandomPictures(),
     description: getSomeText(),
     start,

@@ -1,5 +1,4 @@
 const ICONS_URL = `img/icons/`;
-export const CURRENCY = `€`;
 
 export const Transfers = [
   `bus`,
@@ -15,20 +14,6 @@ export const Activities = [
   `check-in`,
   `restaurant`,
   `sightseeing`
-];
-
-export const Types = [
-  `bus`,
-  `check-in`,
-  `drive`,
-  `flight`,
-  `restaurant`,
-  `ship`,
-  `sightseeing`,
-  `taxi`,
-  `train`,
-  `transport`,
-  `trip`
 ];
 
 export const TypesIcons = {
@@ -72,23 +57,11 @@ export const Options = [
   },
 ];
 
-export const Filters = [
-  {
-    type: `everything`,
-    name: `Everything`,
-    value : true
-  },
-  {
-    type: `future`,
-    name: `Future`,
-    value: false
-  },
-  {
-    type: `past`,
-    name: `Past`,
-    value: false
-  }
-];
+export const FilterType = {
+  ALL: `everything`,
+  FUTURE: `future`,
+  PAST: `past`,
+};
 
 export const Menu = [
   {

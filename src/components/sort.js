@@ -1,20 +1,36 @@
 import AbstractComponent from "./abstract-component";
 
-export const SortType = [
-  `event`,
-  `time`,
-  `price`,
+export const SortType = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`,
+};
+
+export const Sorts = [
+  {
+    type: SortType.EVENT,
+    name: `event`,
+  },
+  {
+    type: SortType.TIME,
+    name: `time`,
+  },
+  {
+    type: SortType.PRICE,
+    name: `price`,
+  }
 ];
+
 
 const createSortMarkup = (items) => {
   return Array.from(items)
     .map((item) => {
-      const checked = item === `event` ? `checked` : ``;
+      const checked = item.type === `event` ? `checked` : ``;
       return (
-        `<div class="trip-sort__item  trip-sort__item--${item}">
-          <input id="sort-${item}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${item}" ${checked}>
-          <label class="trip-sort__btn" for="sort-${item}">
-            ${item}
+        `<div class="trip-sort__item  trip-sort__item--${item.name}">
+          <input id="sort-${item.name}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="${item.name}" ${checked}>
+          <label class="trip-sort__btn" for="sort-${item.name}">
+            ${item.name}
           </label>
          </div>`
       );
@@ -38,7 +54,7 @@ const createSortTemplate = (filters) => {
 export default class Sort extends AbstractComponent {
   constructor() {
     super();
-    this._items = SortType;
+    this._items = Sorts;
     this._currenSortType = null;
   }
 

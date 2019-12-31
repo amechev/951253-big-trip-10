@@ -1,24 +1,28 @@
 import AbstractComponent from "./abstract-component";
 
-const createFilterMarkup = (items) => {
-  return Array.from(items)
-    .map((item) => {
-      const isChecked = item.value ? `checked` : ``;
-      return (
-        `<div class="trip-filters__filter">
-          <input id="filter-${item.type}" class="trip-filters__filter-input  visually-hidden" 
-            type="radio"
-            name="trip-filter" 
-            value="${item.type}"
-            ${isChecked}>
-          <label class="trip-filters__filter-label" for="filter-everything">${item.name}</label>
-        </div>`
-      );
-    }).join(`\n`);
+const FILTER_ID_PREFIX = `filter_`;
+
+const getFilterNameById = (id) => {
+  return id.substring(FILTER_ID_PREFIX.length);
 };
 
-const createSiteFilterTemplate = (filters) => {
-  const filtersMarkup = createFilterMarkup(filters);
+const createFilterMarkup = (filter, isChecked) => {
+  const {name} = filter;
+  return (
+    `<div class="trip-filters__filter">
+      <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden" 
+        type="radio"
+        name="trip-filter" 
+        value="${name}"
+        ${isChecked ? `checked` : ``}>
+      <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
+    </div>`
+  );
+};
+
+const createFilterTemplate = (filters) => {
+  const filtersMarkup = filters.map((it) => createFilterMarkup(it, it.checked)).join(`\n`);
+
   return (
     `<form class="trip-filters" action="#" method="get">
         ${filtersMarkup}
@@ -29,12 +33,19 @@ const createSiteFilterTemplate = (filters) => {
 };
 
 export default class Filter extends AbstractComponent {
-  constructor(items) {
+  constructor(filters) {
     super();
-    this._items = items;
+    this._filters = filters;
   }
 
   getTemplate() {
-    return createSiteFilterTemplate(this._items);
+    return createFilterTemplate(this._filters);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`change`, (evt) => {
+      const filterName = getFilterNameById(evt.target.id);
+      handler(filterName);
+    });
   }
 }

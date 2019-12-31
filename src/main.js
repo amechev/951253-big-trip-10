@@ -1,29 +1,43 @@
-import {render, RenderPosition} from "./utils/render";
 import InfoComponent from "./components/info";
 import TotalComponent from "./components/total";
+import MenuComponent from "./components/menu";
+import TripController from "./controllers/trip";
+import PointsComponent from './components/points.js';
+import PointsModel from './models/points.js';
+import {render, RenderPosition} from "./utils/render";
 import {generateCards} from "./mock/card";
 import {generateMenu} from "./mock/menu";
-import MenuComponent from "./components/menu";
-import {generateFilters} from "./mock/filters";
-import FilterComponent from "./components/filter";
-import TripController from "./controllers/trip";
+import FilterController from "./controllers/filters";
+import 'flatpickr/dist/flatpickr.css';
 
-const CARDS_COUNT = 4;
-const events = generateCards(CARDS_COUNT);
+const POINTS_COUNT = 4;
+const points = generateCards(POINTS_COUNT);
+const pointsModel = new PointsModel();
+pointsModel.setPoints(points);
+
+const headerElement = document.querySelector(`.trip-main`);
 const siteControlsElement = document.querySelector(`.trip-controls`);
-const siteEventsElement = document.querySelector(`.trip-events`);
+const sitePointsElement = document.querySelector(`.trip-events`);
 
-const menu = generateMenu();
-render(siteControlsElement, new MenuComponent(menu), RenderPosition.BEFOREEND);
+const menuItems = generateMenu();
+const menuComponent = new MenuComponent(menuItems);
+render(siteControlsElement, menuComponent, RenderPosition.BEFOREEND);
 
-const filters = generateFilters();
-render(siteControlsElement, new FilterComponent(filters), RenderPosition.BEFOREEND);
+const filterController = new FilterController(siteControlsElement, pointsModel);
+filterController.render();
 
 const siteInfoElement = document.querySelector(`.trip-info`);
-if (events.length) {
-  render(siteInfoElement, new InfoComponent(events), RenderPosition.BEFOREEND);
-  render(siteInfoElement, new TotalComponent(events), RenderPosition.BEFOREEND);
-}
 
-const tripController = new TripController(siteEventsElement);
-tripController.render(events);
+render(siteInfoElement, new InfoComponent(pointsModel), RenderPosition.BEFOREEND);
+render(siteInfoElement, new TotalComponent(pointsModel), RenderPosition.BEFOREEND);
+
+const pointsComponent = new PointsComponent();
+render(sitePointsElement, pointsComponent, RenderPosition.BEFOREEND);
+
+const tripController = new TripController(pointsComponent, pointsModel);
+tripController.render();
+
+headerElement.querySelector(`.trip-main__event-add-btn`)
+  .addEventListener(`click`, () => {
+    tripController.createPoint();
+  });

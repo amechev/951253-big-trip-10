@@ -6,7 +6,7 @@ const createCardTemplate = () => {
   );
 };
 
-export default class NoCards extends AbstractComponent {
+export default class NoPoints extends AbstractComponent {
   getTemplate() {
     return createCardTemplate();
   }

@@ -6,7 +6,7 @@ const createDayItemTemplate = (date, cnt) => {
   let dateText = ``;
   if (date && cnt) {
     dateTime = `${date.getDate()}.${date.getMonth()}.${date.getFullYear()}`;
-    dateText = `${MonthNames[date.getMonth() - 1]} ${date.getDate()}`;
+    dateText = `${MonthNames[date.getMonth()]} ${date.getDate()}`;
   }
 
   return (

@@ -24,8 +24,8 @@ const getPointTimeMarkup = (start, finish) => {
               <time class="event__end-time" datetime="${finish}">${finishTime}</time>`;
 };
 
-const createCardTemplate = (card) => {
-  const {type, location, start, finish, price, options} = card;
+const createPointTemplate = (point) => {
+  const {type, destination, start, finish, price, options} = point;
   const pointType = Transfers.some((el) => el === type) ? `to` : `on`;
   const pointTimeMarkup = getPointTimeMarkup(start, finish);
 
@@ -39,7 +39,7 @@ const createCardTemplate = (card) => {
           <div class="event__type">
             <img class="event__type-icon" width="42" height="42" src="${TypesIcons[type]}" alt="Event type icon">
           </div>
-          <h3 class="event__title">${type} ${pointType} ${location}</h3>
+          <h3 class="event__title">${type} ${pointType} ${destination}</h3>
 
           <div class="event__schedule">
             <p class="event__time">
@@ -65,14 +65,14 @@ const createCardTemplate = (card) => {
   );
 };
 
-export default class Card extends AbstractSmartComponent {
-  constructor(card) {
+export default class Point extends AbstractSmartComponent {
+  constructor(point) {
     super();
-    this._card = card;
+    this._point = point;
   }
 
   getTemplate() {
-    return createCardTemplate(this._card);
+    return createPointTemplate(this._point);
   }
 
   setEditButtonClickHandler(handler) {
