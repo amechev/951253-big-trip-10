@@ -58,6 +58,5 @@ Promise.all([
   offersModel.setOffers(offers);
   pointsModel.setPoints(points);
   tripController.render();
-}).catch((err) => {
-  console.log(err);
+}).catch(() => {
 });
