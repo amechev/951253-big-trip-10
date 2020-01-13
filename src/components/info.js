@@ -2,10 +2,16 @@ import {MonthNames} from "../const";
 import AbstractComponent from "./abstract-component";
 
 const createInfoTemplate = (points) => {
-  const firstDateOfTrip = `${MonthNames[points[0].start.getMonth() - 1]} ${points[0].start.getDate()}`;
-  const latsDateOfTrip = points[points.length - 1].finish.getDate();
-  const firstCity = points[0].destination;
-  const lastCity = points[points.length - 1].destination;
+  points.sort((a, b) => a.start - b.start);
+  if (!points.length) {
+    return false;
+  }
+  const startDate = new Date(points[0].start);
+  const finishDate = new Date(points[points.length - 1].finish);
+  const firstDateOfTrip = `${MonthNames[startDate.getMonth()]} ${startDate.getDate()}`;
+  const latsDateOfTrip = finishDate.getDate();
+  const firstCity = points[0].destination.name;
+  const lastCity = points[points.length - 1].destination.name;
 
   return (
     `<div class="trip-info__main">
@@ -20,7 +26,7 @@ export default class Info extends AbstractComponent {
   constructor(pointsModel) {
     super();
     this._pointsModel = pointsModel;
-    this._points = null;
+    this._points = [];
   }
 
   getTemplate() {

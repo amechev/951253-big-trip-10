@@ -24,7 +24,7 @@ const createDayItemTemplate = (date, cnt) => {
 export default class Day extends AbstractComponent {
   constructor(date, cnt) {
     super();
-    this._date = date || ``;
+    this._date = new Date(date) || ``;
     this._cnt = cnt || ``;
   }
 

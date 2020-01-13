@@ -30,33 +30,6 @@ export const TypesIcons = {
   'trip': `${ICONS_URL}trip.png`
 };
 
-export const Cities = [
-  `Amsterdam`, `Geneva`, `Prague`, `Perth`, `Munich`
-]
-
-export const Options = [
-  {
-    type: 'luggage',
-    name: `Add luggage`,
-    price: `10`
-  },
-  {
-    type: 'comfort',
-    name: `Switch to comfort class`,
-    price: `150`
-  },
-  {
-    type: 'meal',
-    name: `Add meal`,
-    price: `2`
-  },
-  {
-    type: 'seats',
-    name: `Choose seats`,
-    price: `9`
-  },
-];
-
 export const FilterType = {
   ALL: `everything`,
   FUTURE: `future`,

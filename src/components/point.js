@@ -1,16 +1,15 @@
-import {Options, Transfers, TypesIcons} from "../const";
+import {Transfers, TypesIcons} from "../const";
 import AbstractSmartComponent from "./abtract-smart-component";
 import moment from "moment";
 
 const createOptionsMarkup = (items) => {
   return Array.from(items)
     .map((item) => {
-      const option = Options.find((el) => el.type === item);
       return (
         `<li class="event__offer">
-          <span class="event__offer-title">${option.name}</span>
+          <span class="event__offer-title">${item.title}</span>
           &plus;
-          &euro;&nbsp;<span class="event__offer-price">${option.price}</span>
+          &euro;&nbsp;<span class="event__offer-price">${item.price}</span>
          </li>`
       );
     }).join(`\n`);
@@ -31,7 +30,8 @@ const createPointTemplate = (point) => {
 
   const offersMarkup = createOptionsMarkup(options);
   const diffTime = moment(finish).diff(moment(start));
-  const diff = moment.utc(diffTime).format(`HH[H] mm[M]`);
+  const diffHours = moment(finish).diff(moment(start), `hours`);
+  const diff = diffHours + `H ` + moment.utc(diffTime).format(`mm[M]`);
 
   return (
     `<li class="trip-events__item">
@@ -39,7 +39,7 @@ const createPointTemplate = (point) => {
           <div class="event__type">
             <img class="event__type-icon" width="42" height="42" src="${TypesIcons[type]}" alt="Event type icon">
           </div>
-          <h3 class="event__title">${type} ${pointType} ${destination}</h3>
+          <h3 class="event__title">${type} ${pointType} ${destination.name}</h3>
 
           <div class="event__schedule">
             <p class="event__time">

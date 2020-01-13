@@ -6,20 +6,21 @@ import SortComponent, {SortType} from "../components/sort";
 import PointController, {EmptyPoint, Mode as PointControllerMode} from './point.js';
 import moment from "moment";
 
-const renderDefaultList = (daysListElement, events, onDataChange, onViewChange) => {
+const renderDefaultList = (daysListElement, points, offers, destinations, onDataChange, onViewChange) => {
   let currentDay = 1;
-  events.sort((a, b) => a.start - b.start);
-  let currentDate = events[0].start;
+  points.sort((a, b) => a.start - b.start);
+  let currentDate = new Date(points[0].start);
   let dayComponent = new DayComponent(currentDate, currentDay);
 
   render(daysListElement, dayComponent, RenderPosition.BEFOREEND);
   let dayEventsListElement = dayComponent.getElement().querySelector(`.trip-events__list`);
   const pointControllers = [];
 
-  events.forEach((item) => {
-    if (item.start.getDate() !== currentDate.getDate()) {
+  points.forEach((item) => {
+    const startDate = new Date(item.start);
+    if (startDate.getDate() !== currentDate.getDate()) {
       currentDay += moment(item.start).startOf(`day`).diff(moment(currentDate).startOf(`day`), `days`);
-      currentDate = item.start;
+      currentDate = new Date(item.start);
       dayComponent = new DayComponent(currentDate, currentDay);
       render(daysListElement, dayComponent, RenderPosition.BEFOREEND);
       const nodes = dayComponent.getElement().querySelectorAll(`.trip-events__list`);
@@ -27,23 +28,23 @@ const renderDefaultList = (daysListElement, events, onDataChange, onViewChange) 
     }
 
     const pointController = new PointController(dayEventsListElement, onDataChange, onViewChange);
-    pointController.render(item, PointControllerMode.DEFAULT);
+    pointController.render(item, offers, destinations, PointControllerMode.DEFAULT);
     pointControllers.push(pointController);
   });
 
   return pointControllers;
 };
 
-const renderSorted = (daysListElement, events, onDataChange, onViewChange) => {
+const renderSorted = (daysListElement, points, offers, destinations, onDataChange, onViewChange) => {
   let dayComponent = new DayComponent();
   render(daysListElement, dayComponent, RenderPosition.BEFOREEND);
 
   let dayEventsListElement = dayComponent.getElement().querySelector(`.trip-events__list`);
 
   const pointControllers = [];
-  events.forEach((item) => {
+  points.forEach((item) => {
     const pointController = new PointController(dayEventsListElement, onDataChange, onViewChange);
-    pointController.render(item, PointControllerMode.DEFAULT);
+    pointController.render(item, offers, destinations, PointControllerMode.DEFAULT);
     pointControllers.push(pointController);
   });
 
@@ -51,11 +52,13 @@ const renderSorted = (daysListElement, events, onDataChange, onViewChange) => {
 };
 
 export default class TripController {
-  constructor(container, pointModel) {
+  constructor(container, pointModel, offersModel, destinationsModel, api) {
     this._container = container;
     this._pointsModel = pointModel;
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
+    this._api = api;
 
-    this._events = [];
     this._showedPointsControllers = [];
     this._noPointsComponent = new NoPointsComponent();
     this._daysListComponent = new DaysListComponent();
@@ -72,8 +75,16 @@ export default class TripController {
     this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  hide() {
+    this._container.hide();
+  }
+
+  show() {
+    this._container.show();
+  }
+
   render() {
-    const points = this._pointsModel.getPoints();
+    const points = this.getPoints();
     const container = this._container.getElement();
 
     if (!points.length) {
@@ -84,7 +95,8 @@ export default class TripController {
     render(container, this._sortComponent, RenderPosition.BEFOREEND);
     render(container, this._daysListComponent, RenderPosition.BEFOREEND);
 
-    this._renderPoints(points);
+
+    this._renderPoints(points, this.getOffers(), this.getDestinations());
   }
 
   createPoint() {
@@ -92,9 +104,24 @@ export default class TripController {
       return;
     }
 
+    const offers = this._offersModel.getOffers();
+    const destinations = this._destinationsModel.getDestinations();
+
     const taskListElement = this._daysListComponent.getElement();
     this._creatingPoint = new PointController(taskListElement, this._onDataChange, this._onViewChange);
-    this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
+    this._creatingPoint.render(EmptyPoint, offers, destinations, PointControllerMode.ADDING);
+  }
+
+  getPoints() {
+    return this._pointsModel.getPoints();
+  }
+
+  getOffers() {
+    return this._offersModel.getOffers();
+  }
+
+  getDestinations() {
+    return this._destinationsModel.getDestinations();
   }
 
   _removePoints() {
@@ -105,23 +132,23 @@ export default class TripController {
     this._daysListComponent.getElement().innerHTML = ``;
   }
 
-  _renderPoints(points) {
+  _renderPoints(points, offers, destinations) {
     const daysListComponent = this._daysListComponent.getElement();
 
     let newPoints = [];
     if (this._dayInfoVisible) {
-      newPoints = renderDefaultList(daysListComponent, points, this._onDataChange, this._onViewChange);
+      newPoints = renderDefaultList(daysListComponent, points, offers, destinations, this._onDataChange, this._onViewChange);
     } else {
-      newPoints = renderSorted(daysListComponent, points, this._onDataChange, this._onViewChange);
+      newPoints = renderSorted(daysListComponent, points, offers, destinations, this._onDataChange, this._onViewChange);
     }
     this._showedPointsControllers = this._showedPointsControllers.concat(newPoints);
   }
 
   _updatePoints() {
     this._removePoints();
-    const points = this._pointsModel.getPoints();
+    const points = this.getPoints();
     if (points.length) {
-      this._renderPoints(points);
+      this._renderPoints(points, this.getOffers(), this.getDestinations());
     }
   }
 
@@ -132,21 +159,40 @@ export default class TripController {
         pointController.destroy();
         this._updatePoints();
       } else {
-        this._pointsModel.addPoint(newData);
-        pointController.render(newData, PointControllerMode.DEFAULT);
-        this._showedPointsControllers = [].concat(pointController, this._showedPointsControllers);
-        this._updatePoints();
+        this._api.createPoint(newData)
+          .then((pointModel) => {
+            this._pointsModel.addPoint(pointModel);
+            pointController.render(pointModel, this.getOffers(), this.getDestinations(), PointControllerMode.DEFAULT);
+            this._showedPointsControllers = [].concat(pointController, this._showedPointsControllers);
+            this._updatePoints();
+          })
+          .catch(() => {
+            pointController.shake();
+          });
+
       }
     } else if (newData === null) {
-      this._pointsModel.removePoint(oldData.id);
-      this._updatePoints();
+      this._api.deletePoint(oldData.id)
+        .then(() => {
+          this._pointsModel.removePoint(oldData.id);
+          this._updatePoints();
+        })
+        .catch(() => {
+          pointController.shake();
+        });
     } else {
-      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
-      if (isSuccess) {
-        pointController.render(newData, PointControllerMode.DEFAULT);
-        pointController.destroy();
-        this._updatePoints();
-      }
+      this._api.updatePoint(oldData.id, newData)
+        .then((taskModel) => {
+          const isSuccess = this._pointsModel.updatePoint(oldData.id, taskModel);
+          if (isSuccess) {
+            pointController.render(newData, this.getOffers(), this.getDestinations(), PointControllerMode.DEFAULT);
+            pointController.destroy();
+            this._updatePoints();
+          }
+        })
+        .catch(() => {
+          pointController.shake();
+        });
     }
   }
 
@@ -156,7 +202,7 @@ export default class TripController {
 
   _onSortTypeChange(sortType) {
     let sortedPoints = [];
-    const points = this._pointsModel.getPoints();
+    const points = this.getPoints();
 
     switch (sortType) {
       case `price`:
@@ -166,7 +212,7 @@ export default class TripController {
         sortedPoints = points.slice().sort((a, b) => (a.start - a.finish) - (b.start - b.finish));
         break;
       case `event`:
-        sortedPoints = points.slice();
+        sortedPoints = points.slice().sort((a, b) => (a.start - a.finish) - (b.start - b.finish));
         break;
     }
 
@@ -174,7 +220,7 @@ export default class TripController {
 
     this._removePoints();
 
-    this._renderPoints(sortedPoints);
+    this._renderPoints(sortedPoints, this.getOffers(), this.getDestinations());
 
   }
 
