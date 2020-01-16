@@ -19,7 +19,7 @@ export default class Points {
   }
 
   setPoints(points) {
-    this._points = Array.from(points);
+    this._points = points.sort((a, b) => (new Date(a.start) - new Date(b.start)));
     if (this._dataChangeHandlers) {
       this._callHandlers(this._dataChangeHandlers);
     }
@@ -52,14 +52,19 @@ export default class Points {
     }
 
     this._points = [].concat(this._points.slice(0, index), point, this._points.slice(index + 1));
-
+    this.sortPointsByDefault();
     this._callHandlers(this._dataChangeHandlers);
     return true;
   }
 
   addPoint(point) {
     this._points = [].concat(point, this._points);
+    this.sortPointsByDefault();
     this._callHandlers(this._dataChangeHandlers);
+  }
+
+  sortPointsByDefault() {
+    this._points.sort((a, b) => (new Date(a.start) - new Date(b.start)));
   }
 
   setFilterChangeHandler(handler) {

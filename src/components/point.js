@@ -1,8 +1,10 @@
 import {Transfers, TypesIcons} from "../const";
 import AbstractSmartComponent from "./abtract-smart-component";
 import moment from "moment";
+import {formatDateToStringDiff} from "../utils/common";
 
-const createOptionsMarkup = (items) => {
+const createOptionsMarkup = (options) => {
+  const items = options.splice(0, 3);
   return Array.from(items)
     .map((item) => {
       return (
@@ -25,13 +27,12 @@ const getPointTimeMarkup = (start, finish) => {
 
 const createPointTemplate = (point) => {
   const {type, destination, start, finish, price, options} = point;
-  const pointType = Transfers.some((el) => el === type) ? `to` : `on`;
+  const pointType = Transfers.some((el) => el === type) ? `to` : `in`;
   const pointTimeMarkup = getPointTimeMarkup(start, finish);
-
-  const offersMarkup = createOptionsMarkup(options);
+  const offersMarkup = createOptionsMarkup(Array.from(options));
   const diffTime = moment(finish).diff(moment(start));
-  const diffHours = moment(finish).diff(moment(start), `hours`);
-  const diff = diffHours + `H ` + moment.utc(diffTime).format(`mm[M]`);
+
+  const diff = formatDateToStringDiff(diffTime);
 
   return (
     `<li class="trip-events__item">

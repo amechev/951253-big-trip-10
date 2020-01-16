@@ -7,18 +7,17 @@ export default class Point {
       this.finish = data[`date_to`];
       this.destination = data[`destination`];
       this.price = data[`base_price`];
-      this.isFavorite = data[`is_favorite`];
+      this.isFavorite = Boolean(data[`is_favorite`]);
       this.options = data[`offers`];
     }
-
   }
 
   toRAW() {
     return {
       'id': this.id,
       'type': this.type,
-      'date_from': this.start ? this.start.toISOString() : null,
-      'date_to': this.finish ? this.finish.toISOString() : null,
+      'date_from': this.start,
+      'date_to': this.finish,
       'offers': Array.from(this.options),
       'destination': this.destination,
       'base_price': this.price,

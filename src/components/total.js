@@ -3,6 +3,10 @@ import AbstractComponent from "./abstract-component";
 const createTotalTemplate = (points) => {
   let total = 0;
   points.forEach((el) => {
+    const options = Array.from(el.options);
+    options.forEach((item) => {
+      total += item.price;
+    });
     total += el.price;
   });
 
@@ -21,7 +25,7 @@ export default class Total extends AbstractComponent {
   }
 
   getTemplate() {
-    this._points = this._pointsModel.getPoints();
+    this._points = this._pointsModel.getPointsAll();
     return createTotalTemplate(this._points);
   }
 }

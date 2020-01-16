@@ -36,7 +36,7 @@ export const FilterType = {
   PAST: `past`,
 };
 
-export const Menu = [
+export const MenuItems = [
   {
     type: `table`,
     name: `Table`,

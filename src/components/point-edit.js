@@ -3,8 +3,11 @@ import AbstractSmartComponent from "./abtract-smart-component";
 import flatpickr from "flatpickr";
 import {formatDate} from "../utils/common";
 import {Mode as PointControllerMode} from "../controllers/point";
+import debounce from 'lodash/debounce';
 
 const OPTION_ID_PREFIX = `event-offer-`;
+const DEBOUNCE_TIMEOUT = 500;
+
 
 const DefaultData = {
   deleteButtonText: `Delete`,
@@ -81,34 +84,67 @@ const createOptionsMarkup = (options, optionsActive) => {
     }).join(`\n`);
 };
 
-const createPhotosMarkup = (items) => {
-  if (!items) {
+const createDestinationMarkup = (destination) => {
+  if (!destination) {
     return ``;
   }
-  return Array.from(items)
-    .map((item) => {
-      return (
-        `<img class="event__photo" src="${item.src}" alt="${item.description}">`
-      );
-    }).join(`\n`);
+
+  let picturesMarkup = ``;
+
+  if (destination.pictures) {
+    picturesMarkup = Array.from(destination.pictures)
+      .map((item) => {
+        return (
+          `<img class="event__photo" src="${item.src}" alt="${item.description}">`
+        );
+      }).join(`\n`);
+  }
+
+  return (
+    `<section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${destination.description}</p>
+
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+           ${picturesMarkup}
+        </div>
+      </div>
+    </section>`
+  );
 };
 
-const createPointEditTemplate = (point, pointOptions = {}) => {
-  const {isFavorite} = point;
-  const {type, destination, start, finish, price, options, mode, externalData, offers, destinations} = pointOptions;
+const createFavoriteMarkup = (isFavorite, mode) => {
+  if (mode === PointControllerMode.ADDING) {
+    return ``;
+  }
+  return (
+    `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
+      <label class="event__favorite-btn" for="event-favorite-1">
+        <span class="visually-hidden">Add to favorite</span>
+        <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+          <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+        </svg>
+      </label>`
+  );
+};
+
+const createPointEditTemplate = (pointOptions = {}) => {
+  const {type, isFavorite, destination, start, finish, price, optionsSelected, mode, externalData, offers, destinations} = pointOptions;
   const offerByType = offers.find((el) => {
     return el.type === type;
   });
 
-  const pointType = Transfers.some((el) => el === type) ? `to` : `on`;
+  const pointType = Transfers.some((el) => el === type) ? `to` : `in`;
   const transfersMarkup = createTransfersMarkup(Transfers, type);
   const activitiesMarkup = createActivitiesMarkup(Activities, type);
   const citiesMarkup = creatingCitiesMarkup(destinations);
-  const optionsMarkup = createOptionsMarkup(offerByType[`offers`], options);
-  const photosMarkup = createPhotosMarkup(destination.pictures);
+  const optionsMarkup = createOptionsMarkup(offerByType[`offers`], optionsSelected);
+  const destinationMarkup = createDestinationMarkup(destination);
   const startDate = formatDate(start);
   const finishDate = formatDate(finish);
   const isChecked = isFavorite ? `checked` : ``;
+  const favoriteMarkup = createFavoriteMarkup(isChecked, mode);
   const resetButtonTxt = mode === PointControllerMode.ADDING ? externalData.cancelButtonText : externalData.deleteButtonText;
   const saveButtonText = externalData.saveButtonText;
 
@@ -172,13 +208,9 @@ const createPointEditTemplate = (point, pointOptions = {}) => {
 
               <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
               <button class="event__reset-btn" type="reset">${resetButtonTxt}</button>
-              <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
-              <label class="event__favorite-btn" for="event-favorite-1">
-                <span class="visually-hidden">Add to favorite</span>
-                <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-                  <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-                </svg>
-              </label>
+              
+              ${favoriteMarkup}
+              
             </header>
             <section class="event__details">
 
@@ -189,17 +221,9 @@ const createPointEditTemplate = (point, pointOptions = {}) => {
                   ${optionsMarkup}
                 </div>
               </section>
+              
+              ${destinationMarkup}
 
-              <section class="event__section  event__section--destination">
-                <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                <p class="event__destination-description">${destination ? destination.description : ``}</p>
-
-                <div class="event__photos-container">
-                  <div class="event__photos-tape">
-                     ${photosMarkup}
-                  </div>
-                </div>
-              </section>
             </section>
           </form>`
   );
@@ -211,6 +235,7 @@ export default class PointEdit extends AbstractSmartComponent {
 
     this._mode = mode;
     this._point = point;
+    this._isFavorite = point.isFavorite;
     this._offers = offers;
     this._destinations = destinations;
     this._pointType = point.type;
@@ -226,18 +251,18 @@ export default class PointEdit extends AbstractSmartComponent {
     this._flatpickrStart = null;
     this._flatpickrFinish = null;
 
-    this._subscribeOnEvents();
     this._applyFlatpickr();
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._point, {
+    return createPointEditTemplate({
       type: this._pointType,
       destination: this._pointDestination,
+      isFavorite: this._isFavorite,
       start: this._pointStart,
       finish: this._pointFinish,
       price: this._pointPrice,
-      options: this._pointOptions,
+      optionsSelected: this._pointOptions,
       mode: this._mode,
       externalData: this._externalData,
       offers: this._offers,
@@ -341,11 +366,14 @@ export default class PointEdit extends AbstractSmartComponent {
   _subscribeOnEvents() {
     const element = this.getElement();
 
-    element.querySelector(`.event__favorite-btn`)
-      .addEventListener(`click`, this._deleteButtonClickHandler);
-
-    element.querySelector(`.event__favorite-btn`)
-      .addEventListener(`click`, this._favoriteHandler);
+    if (this._mode !== PointControllerMode.ADDING) {
+      element.querySelector(`.event__favorite-checkbox`)
+        .addEventListener(`change`, debounce((evt) => {
+          this._isFavorite = evt.target.checked;
+          this.rerender();
+          this._favoriteHandler();
+        }, DEBOUNCE_TIMEOUT));
+    }
 
     element.querySelector(`.event__save-btn`)
       .addEventListener(`click`, this._submitHandler);
@@ -354,6 +382,7 @@ export default class PointEdit extends AbstractSmartComponent {
       item.addEventListener(`click`, (event) => {
         if (event.target.value) {
           this._pointType = event.target.value;
+          this._pointOptions = [];
           this.rerender();
         }
       });
@@ -370,19 +399,23 @@ export default class PointEdit extends AbstractSmartComponent {
     element.querySelector(`.event__input--price`)
       .addEventListener(`input`, (evt) => {
         this._pointPrice = evt.target.value;
-        this.rerender();
       });
 
     element.querySelector(`#event-start-time-1`)
-      .addEventListener(`input`, (evt) => {
+      .addEventListener(`change`, (evt) => {
         if (evt.target.value) {
           this._pointStart = this._flatpickrStart.parseDate(evt.target.value, `d/m/y H:i`);
+
+          if (new Date(this._pointStart) > new Date(this._pointFinish)) {
+            this._pointFinish = this._pointStart;
+          }
+
           this.rerender();
         }
       });
 
     element.querySelector(`#event-end-time-1`)
-      .addEventListener(`input`, (evt) => {
+      .addEventListener(`change`, (evt) => {
         if (evt.target.value) {
           this._pointFinish = this._flatpickrFinish.parseDate(evt.target.value, `d/m/y H:i`);
           this.rerender();
@@ -394,13 +427,13 @@ export default class PointEdit extends AbstractSmartComponent {
       options.addEventListener(`change`, (evt) => {
         const optionName = getOptionNameByClass(evt.target.id);
         const offerByType = this._offers.find((el) => {
-          return el.type === this._point.type;
+          return el.type === this._pointType;
         });
         if (evt.target.checked) {
           this._pointOptions.push(offerByType.offers[optionName]);
         } else {
           this._pointOptions = this._pointOptions.filter((el) => {
-            return el !== offerByType.offers[optionName];
+            return el.title !== offerByType.offers[optionName].title;
           });
         }
         this.rerender();

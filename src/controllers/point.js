@@ -31,7 +31,7 @@ const parseFormData = (formData, context) => {
   point.destination = context._pointDestination;
   point.start = context._flatpickrStart.parseDate(formData.get(`event-start-time`), `d/m/y H:i`);
   point.finish = context._flatpickrFinish.parseDate(formData.get(`event-end-time`), `d/m/y H:i`);
-  point.price = +formData.get(`event-price`);
+  point.price = parseInt(formData.get(`event-price`), 10);
   point.isFavorite = !!formData.get(`event-favorite`);
   point.options = context._pointOptions;
 
@@ -46,8 +46,6 @@ export default class PointController {
     this._onViewChange = onViewChange;
 
     this._mode = Mode.DEFAULT;
-    this._offers = [];
-    this._destinations = [];
 
     this._pointComponent = null;
     this._pointEditComponent = null;
@@ -59,8 +57,6 @@ export default class PointController {
     const oldPointComponent = this._pointComponent;
     const oldPointEditComponent = this._pointEditComponent;
     this._mode = mode;
-    this._offers = offers;
-    this._destinations = destinations;
 
     this._pointComponent = new PointComponent(point);
     this._pointEditComponent = new PointEditComponent(point, offers, destinations, mode);
@@ -73,8 +69,9 @@ export default class PointController {
     this._pointEditComponent.setFavoritesButtonClickHandler(() => {
       const newPoint = PointModel.clone(point);
       newPoint.isFavorite = !newPoint.isFavorite;
+      const disableRerender = true;
 
-      this._onDataChange(this, point, newPoint);
+      this._onDataChange(this, point, newPoint, disableRerender);
     });
 
     this._pointEditComponent.setSubmitHandler((evt) => {
@@ -172,7 +169,7 @@ export default class PointController {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyPoint, this._offers, this._destinations, null);
+        this._onDataChange(this, EmptyPoint, null);
       }
       this._replaceEditToPoint();
     }

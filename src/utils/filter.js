@@ -5,11 +5,11 @@ export const getEverythingPoints = (points) => {
 };
 
 export const getFuturePoints = (points) => {
-  return points.filter((point) => !point.start > new Date());
+  return points.filter((point) => new Date(point.start) > new Date());
 };
 
 export const getPastPoints = (points) => {
-  return points.filter((point) => !point.finish < new Date());
+  return points.filter((point) => new Date(point.start) < new Date());
 };
 
 export const getPointsByFilter = (points, filterType) => {

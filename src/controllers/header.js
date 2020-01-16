@@ -1,6 +1,6 @@
 import HeaderComponent from "../components/header";
 import {render, RenderPosition} from "../utils/render";
-import {generateMenu} from "../mock/menu";
+import {MenuItems} from "../const";
 import MenuComponent from "../components/menu";
 import FilterController from "./filters";
 import InfoComponent from "../components/info";
@@ -37,7 +37,7 @@ export default class HeaderController {
 
     const controlsContainerElement = document.querySelector(`.trip-controls`);
 
-    const menuItems = generateMenu();
+    const menuItems = MenuItems;
     this._menuComponent = new MenuComponent(menuItems);
     render(controlsContainerElement, this._menuComponent, RenderPosition.BEFOREEND);
 

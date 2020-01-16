@@ -6,10 +6,13 @@ import SortComponent, {SortType} from "../components/sort";
 import PointController, {EmptyPoint, Mode as PointControllerMode} from './point.js';
 import moment from "moment";
 
-const renderDefaultList = (daysListElement, points, offers, destinations, onDataChange, onViewChange) => {
-  let currentDay = 1;
-  points.sort((a, b) => a.start - b.start);
+const renderDefaultList = (daysListElement, allPoints, points, offers, destinations, onDataChange, onViewChange) => {
   let currentDate = new Date(points[0].start);
+  let currentDay = 1;
+  let firstDate = new Date(allPoints[0].start);
+  const futureDay = moment(points[0].start).startOf(`day`).diff(moment(firstDate).startOf(`day`), `days`);
+
+  currentDay = futureDay ? futureDay + 1 : 1;
   let dayComponent = new DayComponent(currentDate, currentDay);
 
   render(daysListElement, dayComponent, RenderPosition.BEFOREEND);
@@ -95,7 +98,6 @@ export default class TripController {
     render(container, this._sortComponent, RenderPosition.BEFOREEND);
     render(container, this._daysListComponent, RenderPosition.BEFOREEND);
 
-
     this._renderPoints(points, this.getOffers(), this.getDestinations());
   }
 
@@ -103,6 +105,8 @@ export default class TripController {
     if (this._creatingPoint) {
       return;
     }
+
+    this._onViewChange();
 
     const offers = this._offersModel.getOffers();
     const destinations = this._destinationsModel.getDestinations();
@@ -137,7 +141,8 @@ export default class TripController {
 
     let newPoints = [];
     if (this._dayInfoVisible) {
-      newPoints = renderDefaultList(daysListComponent, points, offers, destinations, this._onDataChange, this._onViewChange);
+      const allPoints = this._pointsModel.getPointsAll();
+      newPoints = renderDefaultList(daysListComponent, allPoints, points, offers, destinations, this._onDataChange, this._onViewChange);
     } else {
       newPoints = renderSorted(daysListComponent, points, offers, destinations, this._onDataChange, this._onViewChange);
     }
@@ -152,7 +157,7 @@ export default class TripController {
     }
   }
 
-  _onDataChange(pointController, oldData, newData) {
+  _onDataChange(pointController, oldData, newData, disableRerender) {
     if (oldData === EmptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
@@ -163,6 +168,10 @@ export default class TripController {
           .then((pointModel) => {
             this._pointsModel.addPoint(pointModel);
             pointController.render(pointModel, this.getOffers(), this.getDestinations(), PointControllerMode.DEFAULT);
+
+            const destroyedPoint = this._showedPointsControllers.pop();
+            destroyedPoint.destroy();
+
             this._showedPointsControllers = [].concat(pointController, this._showedPointsControllers);
             this._updatePoints();
           })
@@ -184,7 +193,7 @@ export default class TripController {
       this._api.updatePoint(oldData.id, newData)
         .then((taskModel) => {
           const isSuccess = this._pointsModel.updatePoint(oldData.id, taskModel);
-          if (isSuccess) {
+          if (isSuccess && !disableRerender) {
             pointController.render(newData, this.getOffers(), this.getDestinations(), PointControllerMode.DEFAULT);
             pointController.destroy();
             this._updatePoints();
@@ -197,7 +206,14 @@ export default class TripController {
   }
 
   _onViewChange() {
-    this._showedPointsControllers.forEach((it) => it.setDefaultView());
+    this._showedPointsControllers.forEach((it) => {
+      it.setDefaultView();
+    });
+
+    if (this._creatingPoint) {
+      this._creatingPoint.destroy();
+      this._creatingPoint = null;
+    }
   }
 
   _onSortTypeChange(sortType) {
@@ -209,10 +225,10 @@ export default class TripController {
         sortedPoints = points.slice().sort((a, b) => b.price - a.price);
         break;
       case `time`:
-        sortedPoints = points.slice().sort((a, b) => (a.start - a.finish) - (b.start - b.finish));
+        sortedPoints = points.slice().sort((a, b) => (new Date(a.start) - new Date(a.finish)) - (new Date(b.start) - new Date(b.finish)));
         break;
       case `event`:
-        sortedPoints = points.slice().sort((a, b) => (a.start - a.finish) - (b.start - b.finish));
+        sortedPoints = points.slice().sort((a, b) => (new Date(a.start) - new Date(b.start)));
         break;
     }
 
