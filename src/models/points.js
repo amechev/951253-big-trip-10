@@ -21,6 +21,7 @@ export default class Points {
       case `event`:
         return points.slice().sort((a, b) => (new Date(a.start) - new Date(b.start)));
     }
+    
     return null;
   }
 
