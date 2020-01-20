@@ -1,6 +1,6 @@
 const ICONS_URL = `img/icons/`;
 
-export const Transfers = [
+export const TRANSFERS = [
   `bus`,
   `drive`,
   `flight`,
@@ -10,13 +10,13 @@ export const Transfers = [
   `transport`,
 ];
 
-export const Activities = [
+export const ACTIVITIES = [
   `check-in`,
   `restaurant`,
   `sightseeing`
 ];
 
-export const TypesIcons = {
+export const TYPES_ICONS = {
   'bus': `${ICONS_URL}bus.png`,
   'check-in': `${ICONS_URL}check-in.png`,
   'drive': `${ICONS_URL}taxi.png`,
@@ -30,13 +30,13 @@ export const TypesIcons = {
   'trip': `${ICONS_URL}trip.png`
 };
 
-export const FilterType = {
+export const FILTER_TYPES = {
   ALL: `everything`,
   FUTURE: `future`,
   PAST: `past`,
 };
 
-export const MenuItems = [
+export const MENU_ITEMS = [
   {
     type: `table`,
     name: `Table`,
@@ -49,7 +49,7 @@ export const MenuItems = [
   }
 ];
 
-export const MonthNames = [
+export const MONTH_NAMES = [
   `JAN`,
   `FEB`,
   `MAR`,
@@ -62,4 +62,27 @@ export const MonthNames = [
   `OCT`,
   `NOV`,
   `DEC`,
+];
+
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+
+export const SORT_TYPES = {
+  EVENT: `event`,
+  TIME: `time`,
+  PRICE: `price`,
+};
+
+export const SORTS = [
+  {
+    type: SORT_TYPES.EVENT,
+    name: `event`,
+  },
+  {
+    type: SORT_TYPES.TIME,
+    name: `time`,
+  },
+  {
+    type: SORT_TYPES.PRICE,
+    name: `price`,
+  }
 ];

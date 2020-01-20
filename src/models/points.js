@@ -1,17 +1,27 @@
 import {getPointsByFilter} from '../utils/filter.js';
-import {FilterType} from "../const";
+import {FILTER_TYPES, SORT_TYPES} from "../const";
 
 export default class Points {
   constructor() {
     this._points = [];
-    this._activeFilterType = FilterType.ALL;
+    this._activeFilterType = FILTER_TYPES.ALL;
+    this._activeSortType = SORT_TYPES.EVENT;
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
   }
 
   getPoints() {
-    return getPointsByFilter(this._points, this._activeFilterType);
+    const points = getPointsByFilter(this._points, this._activeFilterType);
+    switch (this._activeSortType) {
+      case `price`:
+        return points.slice().sort((a, b) => b.price - a.price);
+      case `time`:
+        return points.slice().sort((a, b) => (new Date(a.start) - new Date(a.finish)) - (new Date(b.start) - new Date(b.finish)));
+      case `event`:
+        return points.slice().sort((a, b) => (new Date(a.start) - new Date(b.start)));
+    }
+    return null;
   }
 
   getPointsAll() {
@@ -19,7 +29,8 @@ export default class Points {
   }
 
   setPoints(points) {
-    this._points = points.sort((a, b) => (new Date(a.start) - new Date(b.start)));
+    this._points = points;
+    this.sortPointsByDefault();
     if (this._dataChangeHandlers) {
       this._callHandlers(this._dataChangeHandlers);
     }
@@ -27,6 +38,11 @@ export default class Points {
 
   setFilter(filterType) {
     this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
+  }
+
+  setSortType(sortType) {
+    this._activeSortType = sortType;
     this._callHandlers(this._filterChangeHandlers);
   }
 

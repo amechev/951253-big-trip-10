@@ -1,10 +1,8 @@
 import PointComponent from "../components/point";
 import PointEditComponent from "../components/point-edit";
 import {render, RenderPosition, replace, remove} from "../utils/render";
-import {Transfers} from "../const";
+import {SHAKE_ANIMATION_TIMEOUT, TRANSFERS} from "../const";
 import PointModel from '../models/point.js';
-
-const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const Mode = {
   ADDING: `adding`,
@@ -12,8 +10,8 @@ export const Mode = {
   EDIT: `edit`,
 };
 
-export const EmptyPoint = {
-  type: Transfers[0],
+export const EMPTY_POINT = {
+  type: TRANSFERS[0],
   destination: ``,
   pictures: null,
   description: ``,
@@ -130,12 +128,12 @@ export default class PointController {
   }
 
   shake() {
-    this._pointEditComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
-    this._pointComponent.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._pointEditComponent.shake();
+    this._pointComponent.shake();
 
     setTimeout(() => {
-      this._pointEditComponent.getElement().style.animation = ``;
-      this._pointComponent.getElement().style.animation = ``;
+      this._pointEditComponent.stopShake();
+      this._pointComponent.stopShake();
 
       this._pointEditComponent.setData({
         saveButtonText: `Save`,
@@ -169,7 +167,7 @@ export default class PointController {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EmptyPoint, null);
+        this._onDataChange(this, EMPTY_POINT, null);
       }
       this._replaceEditToPoint();
     }

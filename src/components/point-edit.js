@@ -1,4 +1,4 @@
-import {Activities, Transfers, TypesIcons} from "../const";
+import {ACTIVITIES, TRANSFERS, TYPES_ICONS} from "../const";
 import AbstractSmartComponent from "./abtract-smart-component";
 import flatpickr from "flatpickr";
 import {formatDate} from "../utils/common";
@@ -115,10 +115,7 @@ const createDestinationMarkup = (destination) => {
 };
 
 const createFavoriteMarkup = (isFavorite, mode) => {
-  if (mode === PointControllerMode.ADDING) {
-    return ``;
-  }
-  return (
+  return mode !== PointControllerMode.ADDING ? (
     `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
@@ -126,7 +123,7 @@ const createFavoriteMarkup = (isFavorite, mode) => {
           <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
         </svg>
       </label>`
-  );
+  ) : ``;
 };
 
 const createPointEditTemplate = (pointOptions = {}) => {
@@ -135,9 +132,9 @@ const createPointEditTemplate = (pointOptions = {}) => {
     return el.type === type;
   });
 
-  const pointType = Transfers.some((el) => el === type) ? `to` : `in`;
-  const transfersMarkup = createTransfersMarkup(Transfers, type);
-  const activitiesMarkup = createActivitiesMarkup(Activities, type);
+  const pointType = TRANSFERS.some((el) => el === type) ? `to` : `in`;
+  const transfersMarkup = createTransfersMarkup(TRANSFERS, type);
+  const activitiesMarkup = createActivitiesMarkup(ACTIVITIES, type);
   const citiesMarkup = creatingCitiesMarkup(destinations);
   const optionsMarkup = createOptionsMarkup(offerByType[`offers`], optionsSelected);
   const destinationMarkup = createDestinationMarkup(destination);
@@ -154,7 +151,7 @@ const createPointEditTemplate = (pointOptions = {}) => {
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
                   <span class="visually-hidden">Choose event type</span>
-                  <img class="event__type-icon" width="17" height="17" src="${TypesIcons[type]}" alt="Event type icon">
+                  <img class="event__type-icon" width="17" height="17" src="${TYPES_ICONS[type]}" alt="Event type icon">
                 </label>
                 <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 

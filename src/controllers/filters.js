@@ -1,5 +1,5 @@
 import FilterComponent from '../components/filter.js';
-import {FilterType} from '../const.js';
+import {FILTER_TYPES} from '../const.js';
 import {render, replace, RenderPosition} from '../utils/render.js';
 import {getPointsByFilter} from '../utils/filter.js';
 
@@ -8,7 +8,7 @@ export default class FilterController {
     this._container = container;
     this._pointsModel = pointsModel;
 
-    this._activeFilterType = FilterType.ALL;
+    this._activeFilterType = FILTER_TYPES.ALL;
     this._filterComponent = null;
 
     this._onDataChange = this._onDataChange.bind(this);
@@ -20,7 +20,7 @@ export default class FilterController {
   render() {
     const container = this._container;
     const allPoints = this._pointsModel.getPointsAll();
-    const filters = Object.values(FilterType).map((filterType) => {
+    const filters = Object.values(FILTER_TYPES).map((filterType) => {
       return {
         name: filterType,
         count: getPointsByFilter(allPoints, filterType).length,

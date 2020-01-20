@@ -1,6 +1,6 @@
 import HeaderComponent from "../components/header";
 import {render, RenderPosition} from "../utils/render";
-import {MenuItems} from "../const";
+import {MENU_ITEMS} from "../const";
 import MenuComponent from "../components/menu";
 import FilterController from "./filters";
 import InfoComponent from "../components/info";
@@ -22,6 +22,7 @@ export default class HeaderController {
 
 
     this._onDataChange = this._onDataChange.bind(this);
+    this._newPointClick = this._newPointClick.bind(this);
 
     this._pointsModel.setDataChangeHandler(this._onDataChange);
   }
@@ -30,15 +31,11 @@ export default class HeaderController {
     const container = this._container;
     const headerComponent = new HeaderComponent();
     render(container, headerComponent, RenderPosition.BEFOREEND);
-    headerComponent.getElement().querySelector(`.trip-main__event-add-btn`)
-      .addEventListener(`click`, () => {
-        this._clickHandler(MenuItem.NEW_POINT);
-      });
+    headerComponent.setNewPointClickHandler(this._newPointClick);
 
     const controlsContainerElement = document.querySelector(`.trip-controls`);
 
-    const menuItems = MenuItems;
-    this._menuComponent = new MenuComponent(menuItems);
+    this._menuComponent = new MenuComponent(MENU_ITEMS);
     render(controlsContainerElement, this._menuComponent, RenderPosition.BEFOREEND);
 
     const filterController = new FilterController(controlsContainerElement, this._pointsModel);
@@ -56,6 +53,10 @@ export default class HeaderController {
   _onDataChange() {
     this._infoContainerElement.innerHTML = ``;
     this._renderInfo();
+  }
+
+  _newPointClick() {
+    this._clickHandler(MenuItem.NEW_POINT);
   }
 
   setActiveItem(menuItem) {

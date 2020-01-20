@@ -28,4 +28,11 @@ export default class Header extends AbstractComponent {
   getTemplate() {
     return createHeaderTemplate(this._points);
   }
+
+  setNewPointClickHandler(handler) {
+    this.getElement().querySelector(`.trip-main__event-add-btn`)
+      .addEventListener(`click`, () => {
+        handler();
+      });
+  }
 }

@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component.js';
+import {SHAKE_ANIMATION_TIMEOUT} from "../const";
 
 export default class AbstractSmartComponent extends AbstractComponent {
   recoveryListeners() {
@@ -16,5 +17,13 @@ export default class AbstractSmartComponent extends AbstractComponent {
     parent.replaceChild(newElement, oldElement);
 
     this.recoveryListeners();
+  }
+
+  shake() {
+    this.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+  }
+
+  stopShake() {
+    this.getElement().style.animation = ``;
   }
 }
