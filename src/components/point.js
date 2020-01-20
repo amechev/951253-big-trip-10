@@ -1,10 +1,12 @@
-import {Transfers, TypesIcons} from "../const";
+import {TRANSFERS} from "../const";
 import AbstractSmartComponent from "./abtract-smart-component";
 import moment from "moment";
-import {formatDateToStringDiff} from "../utils/common";
+import {formatDateToStringDiff, getIconByPointType} from "../utils/common";
+
+const MAX_OPTIONS_COUNT = 3;
 
 const createOptionsMarkup = (options) => {
-  const items = options.splice(0, 3);
+  const items = options.splice(0, MAX_OPTIONS_COUNT);
   return Array.from(items)
     .map((item) => {
       return (
@@ -27,18 +29,19 @@ const getPointTimeMarkup = (start, finish) => {
 
 const createPointTemplate = (point) => {
   const {type, destination, start, finish, price, options} = point;
-  const pointType = Transfers.some((el) => el === type) ? `to` : `in`;
+  const pointType = TRANSFERS.some((el) => el === type) ? `to` : `in`;
   const pointTimeMarkup = getPointTimeMarkup(start, finish);
   const offersMarkup = createOptionsMarkup(Array.from(options));
   const diffTime = moment(finish).diff(moment(start));
 
   const diff = formatDateToStringDiff(diffTime);
+  const icon = getIconByPointType(type);
 
   return (
     `<li class="trip-events__item">
         <div class="event">
           <div class="event__type">
-            <img class="event__type-icon" width="42" height="42" src="${TypesIcons[type]}" alt="Event type icon">
+            <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
           </div>
           <h3 class="event__title">${type} ${pointType} ${destination.name}</h3>
 

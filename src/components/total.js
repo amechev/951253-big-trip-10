@@ -1,14 +1,21 @@
 import AbstractComponent from "./abstract-component";
 
+const getSummaryByPrice = (arr) => {
+  return arr.reduce((accumulator, currentValue) => {
+    return accumulator + currentValue.price;
+  }, 0);
+};
+
 const createTotalTemplate = (points) => {
-  let total = 0;
-  points.forEach((el) => {
-    const options = Array.from(el.options);
-    options.forEach((item) => {
-      total += item.price;
-    });
-    total += el.price;
+  const optionsArr = points.map((el) => {
+    return getSummaryByPrice(el.options);
   });
+
+  const optionsSummary = optionsArr.reduce((a, b) => {
+    return a + b;
+  });
+
+  const total = getSummaryByPrice(points) + optionsSummary;
 
   return (
     `<p class="trip-info__cost">

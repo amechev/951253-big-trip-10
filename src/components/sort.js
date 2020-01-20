@@ -1,26 +1,5 @@
 import AbstractComponent from "./abstract-component";
-
-export const SortType = {
-  EVENT: `event`,
-  TIME: `time`,
-  PRICE: `price`,
-};
-
-export const Sorts = [
-  {
-    type: SortType.EVENT,
-    name: `event`,
-  },
-  {
-    type: SortType.TIME,
-    name: `time`,
-  },
-  {
-    type: SortType.PRICE,
-    name: `price`,
-  }
-];
-
+import {SORTS} from "../const";
 
 const createSortMarkup = (items) => {
   return Array.from(items)
@@ -54,7 +33,7 @@ const createSortTemplate = (filters) => {
 export default class Sort extends AbstractComponent {
   constructor() {
     super();
-    this._items = Sorts;
+    this._items = SORTS;
     this._currenSortType = null;
   }
 

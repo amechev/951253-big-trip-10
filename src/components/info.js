@@ -1,9 +1,7 @@
-import {MonthNames} from "../const";
+import {MONTH_NAMES} from "../const";
 import AbstractComponent from "./abstract-component";
 
-const findUniqueDestinations = (value, index, self) => {
-  return self.indexOf(value) === index;
-};
+const MAX_DESTINATIONS_COUNTER = 3;
 
 const createInfoTemplate = (points) => {
   if (!points || !points.length) {
@@ -12,13 +10,11 @@ const createInfoTemplate = (points) => {
 
   points.sort((a, b) => a.start - b.start);
 
-  let destinationNames = [];
-  points.forEach((el) => {
-    destinationNames.push(el.destination.name);
+  let destinationNames = points.map((el) => {
+    return el.destination.name;
   });
 
-  destinationNames.filter(findUniqueDestinations);
-  if (destinationNames.length > 3) {
+  if (destinationNames.length > MAX_DESTINATIONS_COUNTER) {
     destinationNames.splice(1, destinationNames.length - 2);
     destinationNames = destinationNames.join(` — ... — `);
   } else {
@@ -27,8 +23,8 @@ const createInfoTemplate = (points) => {
 
   const startDate = new Date(points[0].start);
   const finishDate = new Date(points[points.length - 1].finish);
-  const firstDateOfTrip = `${startDate.getDate()} ${MonthNames[startDate.getMonth()]}`;
-  const latsDateOfTrip = `${finishDate.getDate()} ${MonthNames[finishDate.getMonth()]}`;
+  const firstDateOfTrip = `${startDate.getDate()} ${MONTH_NAMES[startDate.getMonth()]}`;
+  const latsDateOfTrip = `${finishDate.getDate()} ${MONTH_NAMES[finishDate.getMonth()]}`;
 
   return (
     `<div class="trip-info__main">

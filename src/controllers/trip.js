@@ -2,9 +2,10 @@ import {render, RenderPosition} from "../utils/render";
 import NoPointsComponent from "../components/no-points";
 import DaysListComponent from "../components/days-list";
 import DayComponent from "../components/day";
-import SortComponent, {SortType} from "../components/sort";
-import PointController, {EmptyPoint, Mode as PointControllerMode} from './point.js';
+import SortComponent from "../components/sort";
+import PointController, {emptyPoint, Mode as PointControllerMode} from './point.js';
 import moment from "moment";
+import {SortType} from "../const";
 
 const renderDefaultList = (daysListElement, allPoints, points, offers, destinations, onDataChange, onViewChange) => {
   let currentDate = new Date(points[0].start);
@@ -113,7 +114,7 @@ export default class TripController {
 
     const taskListElement = this._daysListComponent.getElement();
     this._creatingPoint = new PointController(taskListElement, this._onDataChange, this._onViewChange);
-    this._creatingPoint.render(EmptyPoint, offers, destinations, PointControllerMode.ADDING);
+    this._creatingPoint.render(emptyPoint, offers, destinations, PointControllerMode.ADDING);
   }
 
   getPoints() {
@@ -158,7 +159,7 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData, disableRerender) {
-    if (oldData === EmptyPoint) {
+    if (oldData === emptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
@@ -217,20 +218,8 @@ export default class TripController {
   }
 
   _onSortTypeChange(sortType) {
-    let sortedPoints = [];
-    const points = this.getPoints();
-
-    switch (sortType) {
-      case `price`:
-        sortedPoints = points.slice().sort((a, b) => b.price - a.price);
-        break;
-      case `time`:
-        sortedPoints = points.slice().sort((a, b) => (new Date(a.start) - new Date(a.finish)) - (new Date(b.start) - new Date(b.finish)));
-        break;
-      case `event`:
-        sortedPoints = points.slice().sort((a, b) => (new Date(a.start) - new Date(b.start)));
-        break;
-    }
+    this._pointsModel.setSortType(sortType);
+    const sortedPoints = this.getPoints();
 
     this._dayInfoVisible = sortType === SortType.EVENT;
 

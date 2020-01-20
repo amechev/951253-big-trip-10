@@ -1,7 +1,7 @@
 import AbstractSmartComponent from "./abtract-smart-component";
 import Chart from "chart.js";
 import ChartDataLabels from "chart.js";
-import {Transfers} from "../const";
+import {TRANSFERS} from "../const";
 import {formatDateToStringDiff} from "../utils/common";
 
 const getData = (items, labels) => {
@@ -77,7 +77,7 @@ const renderColorsChart = (colorsCtx, points) => {
 
 const renderTransportChart = (transportCtx, points) => {
   const transfers = points.filter((el) => {
-    if (Transfers.some((item) => {
+    if (TRANSFERS.some((item) => {
       return item === el.type;
     })) {
       return el;

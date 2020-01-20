@@ -1,17 +1,27 @@
 import {getPointsByFilter} from '../utils/filter.js';
-import {FilterType} from "../const";
+import {FilterType, SortType} from "../const";
 
 export default class Points {
   constructor() {
     this._points = [];
     this._activeFilterType = FilterType.ALL;
+    this._activeSortType = SortType.EVENT;
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
   }
 
   getPoints() {
-    return getPointsByFilter(this._points, this._activeFilterType);
+    const points = getPointsByFilter(this._points, this._activeFilterType);
+    switch (this._activeSortType) {
+      case `price`:
+        return points.slice().sort((a, b) => b.price - a.price);
+      case `time`:
+        return points.slice().sort((a, b) => (new Date(a.start) - new Date(a.finish)) - (new Date(b.start) - new Date(b.finish)));
+      case `event`:
+        return points.slice().sort((a, b) => (new Date(a.start) - new Date(b.start)));
+    }
+    return null;
   }
 
   getPointsAll() {
@@ -19,14 +29,38 @@ export default class Points {
   }
 
   setPoints(points) {
-    this._points = points.sort((a, b) => (new Date(a.start) - new Date(b.start)));
+    this._points = points;
+    this.sortPointsByDefault();
     if (this._dataChangeHandlers) {
       this._callHandlers(this._dataChangeHandlers);
     }
   }
 
+  // Необходимо, так как почему-то в запросе points цены в доп.опциях отличаются от тех что приходят в offers
+  updateOffers(offers) {
+    this._points = this._points.map((el) => {
+      const optionsByType = offers.find((offer) => {
+        return offer.type === el.type;
+      }).offers;
+
+      el.options = el.options.map((option) => {
+        option.price = optionsByType.find((optionByType) => {
+          return optionByType.title === option.title;
+        }).price;
+        return option;
+      });
+
+      return el;
+    });
+  }
+
   setFilter(filterType) {
     this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
+  }
+
+  setSortType(sortType) {
+    this._activeSortType = sortType;
     this._callHandlers(this._filterChangeHandlers);
   }
 

@@ -24,6 +24,7 @@ Promise.all([
   destinationsModel.setDestinations(destinations);
   offersModel.setOffers(offers);
   pointsModel.setPoints(points);
+  pointsModel.updateOffers(offers);
 
   const headerContainerElement = document.querySelector(`.page-header__container`);
   const pointsContainerElement = document.querySelector(`.trip-events`);
