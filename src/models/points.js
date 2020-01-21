@@ -36,6 +36,20 @@ export default class Points {
     }
   }
 
+  // Необходимо, так как почему-то в запросе points цены в доп.опциях отличаются от тех что приходят в offers
+  updateOffers(offers) {
+    this._points = this._points.map((el) => {
+      const optionsByType = offers.find((offer) => {return offer.type === el.type}).offers;
+
+      el.options = el.options.map((option) => {
+        option.price = optionsByType.find((optionByType) => {return optionByType.title === option.title}).price;
+        return option;
+      });
+
+      return el;
+    });
+  }
+
   setFilter(filterType) {
     this._activeFilterType = filterType;
     this._callHandlers(this._filterChangeHandlers);
