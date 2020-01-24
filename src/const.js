@@ -1,6 +1,6 @@
 const ICONS_URL = `img/icons/`;
 
-export const SHAKE_ANIMATION_TIMEOUT = 600
+export const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const TRANSFERS = [
   `bus`,
