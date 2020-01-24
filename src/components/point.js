@@ -1,7 +1,7 @@
-import {TRANSFERS, TYPES_ICONS} from "../const";
+import {TRANSFERS} from "../const";
 import AbstractSmartComponent from "./abtract-smart-component";
 import moment from "moment";
-import {formatDateToStringDiff} from "../utils/common";
+import {formatDateToStringDiff, getIconByPointType} from "../utils/common";
 
 const MAX_OPTIONS_COUNT = 3;
 
@@ -35,12 +35,13 @@ const createPointTemplate = (point) => {
   const diffTime = moment(finish).diff(moment(start));
 
   const diff = formatDateToStringDiff(diffTime);
+  const icon = getIconByPointType(type);
 
   return (
     `<li class="trip-events__item">
         <div class="event">
           <div class="event__type">
-            <img class="event__type-icon" width="42" height="42" src="${TYPES_ICONS[type]}" alt="Event type icon">
+            <img class="event__type-icon" width="42" height="42" src="${icon}" alt="Event type icon">
           </div>
           <h3 class="event__title">${type} ${pointType} ${destination.name}</h3>
 

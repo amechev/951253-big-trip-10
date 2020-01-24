@@ -1,4 +1,5 @@
 import moment from "moment";
+import {POINTS} from "../const";
 
 export const formatDate = (date) => {
   return moment(date).format(`DD/MM/YY HH:mm`);
@@ -16,4 +17,11 @@ export const formatDateToStringDiff = (diffTime) => {
   let diffMinutes = +moment.duration(diffTime)._data.minutes;
   diffMinutes = diffMinutes ? formatToDouble(diffMinutes) + `M` : ``;
   return diffDays + diffHours + diffMinutes;
+};
+
+export const getIconByPointType = (type) => {
+  const point = POINTS.find((el) => {
+    return el.title === type;
+  });
+  return point.icon;
 };

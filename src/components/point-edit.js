@@ -1,18 +1,17 @@
-import {ACTIVITIES, TRANSFERS, TYPES_ICONS} from "../const";
+import {ACTIVITIES, TRANSFERS} from "../const";
 import AbstractSmartComponent from "./abtract-smart-component";
 import flatpickr from "flatpickr";
-import {formatDate} from "../utils/common";
+import {formatDate, getIconByPointType} from "../utils/common";
 import {Mode as PointControllerMode} from "../controllers/point";
 import debounce from 'lodash/debounce';
 
 const OPTION_ID_PREFIX = `event-offer-`;
 const DEBOUNCE_TIMEOUT = 500;
 
-
 const DefaultData = {
-  deleteButtonText: `Delete`,
-  saveButtonText: `Save`,
-  cancelButtonText: `Cancel`
+  DELETE_BUTTON_TXT: `Delete`,
+  SAVE_BUTTON_TXT: `Save`,
+  CANCEL_BUTTON_TXT: `Cancel`
 };
 
 const getOptionNameByClass = (name) => {
@@ -142,8 +141,9 @@ const createPointEditTemplate = (pointOptions = {}) => {
   const finishDate = formatDate(finish);
   const isChecked = isFavorite ? `checked` : ``;
   const favoriteMarkup = createFavoriteMarkup(isChecked, mode);
-  const resetButtonTxt = mode === PointControllerMode.ADDING ? externalData.cancelButtonText : externalData.deleteButtonText;
-  const saveButtonText = externalData.saveButtonText;
+  const resetButtonTxt = mode === PointControllerMode.ADDING ? externalData.CANCEL_BUTTON_TXT : externalData.DELETE_BUTTON_TXT;
+  const SAVE_BUTTON_TXT = externalData.SAVE_BUTTON_TXT;
+  const icon = getIconByPointType(type);
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -151,7 +151,7 @@ const createPointEditTemplate = (pointOptions = {}) => {
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
                   <span class="visually-hidden">Choose event type</span>
-                  <img class="event__type-icon" width="17" height="17" src="${TYPES_ICONS[type]}" alt="Event type icon">
+                  <img class="event__type-icon" width="17" height="17" src="${icon}" alt="Event type icon">
                 </label>
                 <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -203,7 +203,7 @@ const createPointEditTemplate = (pointOptions = {}) => {
                 <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
               </div>
 
-              <button class="event__save-btn  btn  btn--blue" type="submit">${saveButtonText}</button>
+              <button class="event__save-btn  btn  btn--blue" type="submit">${SAVE_BUTTON_TXT}</button>
               <button class="event__reset-btn" type="reset">${resetButtonTxt}</button>
               
               ${favoriteMarkup}

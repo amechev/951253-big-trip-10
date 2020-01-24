@@ -1,11 +1,11 @@
 import {getPointsByFilter} from '../utils/filter.js';
-import {FILTER_TYPES, SORT_TYPES} from "../const";
+import {FilterType, SortType} from "../const";
 
 export default class Points {
   constructor() {
     this._points = [];
-    this._activeFilterType = FILTER_TYPES.ALL;
-    this._activeSortType = SORT_TYPES.EVENT;
+    this._activeFilterType = FilterType.ALL;
+    this._activeSortType = SortType.EVENT;
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
@@ -39,10 +39,14 @@ export default class Points {
   // Необходимо, так как почему-то в запросе points цены в доп.опциях отличаются от тех что приходят в offers
   updateOffers(offers) {
     this._points = this._points.map((el) => {
-      const optionsByType = offers.find((offer) => {return offer.type === el.type}).offers;
+      const optionsByType = offers.find((offer) => {
+        return offer.type === el.type;
+      }).offers;
 
       el.options = el.options.map((option) => {
-        option.price = optionsByType.find((optionByType) => {return optionByType.title === option.title}).price;
+        option.price = optionsByType.find((optionByType) => {
+          return optionByType.title === option.title;
+        }).price;
         return option;
       });
 

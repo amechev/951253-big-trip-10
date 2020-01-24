@@ -1,4 +1,4 @@
-import {FILTER_TYPES} from '../const.js';
+import {FilterType} from '../const.js';
 
 export const getEverythingPoints = (points) => {
   return points;
@@ -14,11 +14,11 @@ export const getPastPoints = (points) => {
 
 export const getPointsByFilter = (points, filterType) => {
   switch (filterType) {
-    case FILTER_TYPES.FUTURE:
+    case FilterType.FUTURE:
       return getFuturePoints(points);
-    case FILTER_TYPES.PAST:
+    case FilterType.PAST:
       return getPastPoints(points);
-    case FILTER_TYPES.ALL:
+    case FilterType.ALL:
       return getEverythingPoints(points);
   }
 

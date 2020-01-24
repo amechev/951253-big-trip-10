@@ -10,7 +10,7 @@ export const Mode = {
   EDIT: `edit`,
 };
 
-export const EMPTY_POINT = {
+export const emptyPoint = {
   type: TRANSFERS[0],
   destination: ``,
   pictures: null,
@@ -76,7 +76,7 @@ export default class PointController {
       evt.preventDefault();
 
       this._pointEditComponent.setData({
-        saveButtonText: `Saving...`,
+        SAVE_BUTTON_TXT: `Saving...`,
       });
 
       const formData = this._pointEditComponent.getData();
@@ -87,7 +87,7 @@ export default class PointController {
 
     this._pointEditComponent.setDeleteButtonClickHandler(() => {
       this._pointEditComponent.setData({
-        deleteButtonText: `Deleting...`,
+        DELETE_BUTTON_TXT: `Deleting...`,
       });
 
       this._onDataChange(this, point, null);
@@ -136,8 +136,8 @@ export default class PointController {
       this._pointComponent.stopShake();
 
       this._pointEditComponent.setData({
-        saveButtonText: `Save`,
-        deleteButtonText: `Delete`,
+        SAVE_BUTTON_TXT: `Save`,
+        DELETE_BUTTON_TXT: `Delete`,
       });
     }, SHAKE_ANIMATION_TIMEOUT);
   }
@@ -167,7 +167,7 @@ export default class PointController {
 
     if (isEscKey) {
       if (this._mode === Mode.ADDING) {
-        this._onDataChange(this, EMPTY_POINT, null);
+        this._onDataChange(this, emptyPoint, null);
       }
       this._replaceEditToPoint();
     }

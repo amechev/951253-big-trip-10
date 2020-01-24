@@ -3,9 +3,9 @@ import NoPointsComponent from "../components/no-points";
 import DaysListComponent from "../components/days-list";
 import DayComponent from "../components/day";
 import SortComponent from "../components/sort";
-import PointController, {EMPTY_POINT, Mode as PointControllerMode} from './point.js';
+import PointController, {emptyPoint, Mode as PointControllerMode} from './point.js';
 import moment from "moment";
-import {SORT_TYPES} from "../const";
+import {SortType} from "../const";
 
 const renderDefaultList = (daysListElement, allPoints, points, offers, destinations, onDataChange, onViewChange) => {
   let currentDate = new Date(points[0].start);
@@ -114,7 +114,7 @@ export default class TripController {
 
     const taskListElement = this._daysListComponent.getElement();
     this._creatingPoint = new PointController(taskListElement, this._onDataChange, this._onViewChange);
-    this._creatingPoint.render(EMPTY_POINT, offers, destinations, PointControllerMode.ADDING);
+    this._creatingPoint.render(emptyPoint, offers, destinations, PointControllerMode.ADDING);
   }
 
   getPoints() {
@@ -159,7 +159,7 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldData, newData, disableRerender) {
-    if (oldData === EMPTY_POINT) {
+    if (oldData === emptyPoint) {
       this._creatingPoint = null;
       if (newData === null) {
         pointController.destroy();
@@ -221,7 +221,7 @@ export default class TripController {
     this._pointsModel.setSortType(sortType);
     const sortedPoints = this.getPoints();
 
-    this._dayInfoVisible = sortType === SORT_TYPES.EVENT;
+    this._dayInfoVisible = sortType === SortType.EVENT;
 
     this._removePoints();
 
